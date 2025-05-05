@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  webtechprofiler:
+    build: .
+    ports:
+      - "8083:8083"
+    environment:
+      - ASPNETCORE_URLS=http://+:8083
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./src/WebTechProfiler:/app/src/WebTechProfiler
+      - /app/src/WebTechProfiler/bin
+      - /app/src/WebTechProfiler/obj 

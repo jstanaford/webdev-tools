@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WebDev Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="h-full">
+    <div class="min-h-full">
+        <nav class="bg-white shadow-sm relative z-50">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 justify-between">
+                    <div class="flex">
+                        <div class="flex flex-shrink-0 items-center">
+                            <a href="/" class="text-xl font-bold text-indigo-600">WebDev Tools</a>
+                        </div>
+                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                            <a asp-page="/Index" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium @(ViewContext.RouteData.Values["Page"]?.ToString() == "/Index" || ViewContext.RouteData.Values["Page"]?.ToString() == "/" ? "border-indigo-500 text-gray-900" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700")">Home</a>
+                            <a asp-page="/TechnologyProfiler" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium @(ViewContext.RouteData.Values["Page"]?.ToString() == "/TechnologyProfiler" ? "border-indigo-500 text-gray-900" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700")">Technology Profiler</a>
+                            <a asp-page="/PortScanner" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium @(ViewContext.RouteData.Values["Page"]?.ToString() == "/PortScanner" ? "border-indigo-500 text-gray-900" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700")">Port Scanner</a>
+                            <a asp-page="/HostViewer" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium @(ViewContext.RouteData.Values["Page"]?.ToString() == "/HostViewer" ? "border-indigo-500 text-gray-900" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700")">Host Viewer</a>
+                            <a asp-page="/DomainProfiler" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium @(ViewContext.RouteData.Values["Page"]?.ToString() == "/DomainProfiler" ? "border-indigo-500 text-gray-900" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700")">Domain Profiler</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main>
+            @RenderBody()
+        </main>
+
+        <footer class="bg-white mt-auto">
+            <div class="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
+                <div class="mt-8 md:order-1 md:mt-0">
+                    <p class="text-center text-xs leading-5 text-gray-500">&copy; 2025 WebDev Tools. </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/js/analyzer.js" asp-append-version="true"></script>
+</body>
+</html>

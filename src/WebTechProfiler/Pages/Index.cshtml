@@ -1,0 +1,43 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Web Development Tools";
+}
+
+<div class="bg-white">
+    <div class="relative isolate px-6 pt-14 lg:px-8">
+        <div class="mx-auto max-w-4xl py-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-8">Web Development Tools</h1>
+                <p class="text-lg leading-8 text-gray-600 mb-12">A collection of tools to help web developers analyze and improve their websites.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+                    <a href="/technology-profiler" class="group">
+                        <div class="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors">
+                            <h2 class="text-2xl font-semibold text-gray-900 mb-3 group-hover:text-indigo-600">Technology Profiler</h2>
+                            <p class="text-gray-600">Analyze websites to detect their tech stack, frameworks, and libraries.</p>
+                        </div>
+                    </a>
+                    <a href="/port-scanner" class="group">
+                        <div class="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors">
+                            <h2 class="text-2xl font-semibold text-gray-900 mb-3 group-hover:text-indigo-600">Port Scanner</h2>
+                            <p class="text-gray-600">Scan and analyze open ports on web servers.</p>
+                        </div>
+                    </a>
+                    <a href="/host-viewer" class="group">
+                        <div class="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors">
+                            <h2 class="text-2xl font-semibold text-gray-900 mb-3 group-hover:text-indigo-600">Host Viewer</h2>
+                            <p class="text-gray-600">View detailed host information and DNS records.</p>
+                        </div>
+                    </a>
+                    <a href="/domain-profiler" class="group">
+                        <div class="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors">
+                            <h2 class="text-2xl font-semibold text-gray-900 mb-3 group-hover:text-indigo-600">Domain Profiler</h2>
+                            <p class="text-gray-600">Analyze domain information, age, and registration details.</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

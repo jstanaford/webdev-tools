@@ -1,0 +1,153 @@
+@page "/domain-profiler"
+@model DomainProfilerModel
+@{
+    ViewData["Title"] = "Domain Profiler";
+}
+
+<div class="bg-white relative overflow-hidden">
+    <!-- Background Animation -->
+    <div class="absolute inset-0 z-0">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- DNS record pattern -->
+                <pattern id="dnsGrid" width="100" height="100" patternUnits="userSpaceOnUse">
+                    <rect width="100" height="100" fill="none" stroke="rgba(99, 102, 241, 0.05)" stroke-width="1"/>
+                    <text x="10" y="20" fill="rgba(99, 102, 241, 0.07)" font-family="monospace" font-size="10">A</text>
+                    <text x="60" y="50" fill="rgba(99, 102, 241, 0.07)" font-family="monospace" font-size="10">CNAME</text>
+                    <text x="30" y="80" fill="rgba(99, 102, 241, 0.07)" font-family="monospace" font-size="10">MX</text>
+                </pattern>
+                <!-- Gradient for floating elements -->
+                <linearGradient id="dnsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="rgba(99, 102, 241, 0.2)"/>
+                    <stop offset="100%" stop-color="rgba(99, 102, 241, 0)"/>
+                </linearGradient>
+            </defs>
+            
+            <!-- Background Pattern -->
+            <rect width="100%" height="100%" fill="url(#dnsGrid)" />
+            
+            <!-- Animated Elements Container -->
+            <g class="dns-records"></g>
+        </svg>
+    </div>
+
+    <!-- Main Content -->
+    <div class="relative isolate px-6 pt-14 lg:px-8 z-10">
+        <div class="mx-auto max-w-4xl py-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-8">Domain Profiler</h1>
+                <p class="text-lg leading-8 text-gray-600 mb-12">Analyze DNS records and domain information.</p>
+                
+                <div class="mt-8">
+                    <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl p-8">
+                        <form id="domainProfilerForm" class="max-w-xl mx-auto">
+                            <div class="space-y-6">
+                                <div>
+                                    <label for="domain" class="block text-sm font-medium leading-6 text-gray-900 text-left">Domain Name</label>
+                                    <div class="mt-2">
+                                        <input type="text" name="domain" id="domain"
+                                               class="block w-full rounded-lg border-0 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                               placeholder="Enter domain (e.g., example.com)" required />
+                                    </div>
+                                </div>
+                                <div>
+                                    <button type="submit"
+                                            class="w-full rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                        Analyze Domain
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="profileResults"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/domainProfiler.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const svg = document.querySelector('.dns-records');
+            const records = [];
+            
+            function createRecord() {
+                const types = ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SOA', 'PTR'];
+                const record = {
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    type: types[Math.floor(Math.random() * types.length)],
+                    speedX: (Math.random() - 0.5) * 0.3,
+                    speedY: (Math.random() - 0.5) * 0.3,
+                    opacity: Math.random() * 0.3 + 0.1,
+                    rotation: Math.random() * 360
+                };
+                
+                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                
+                rect.setAttribute("width", "60");
+                rect.setAttribute("height", "30");
+                rect.setAttribute("rx", "4");
+                rect.setAttribute("fill", "url(#dnsGradient)");
+                rect.setAttribute("opacity", record.opacity);
+                
+                text.textContent = record.type;
+                text.setAttribute("x", "30");
+                text.setAttribute("y", "20");
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "rgba(99, 102, 241, 0.8)");
+                text.setAttribute("font-family", "monospace");
+                text.setAttribute("font-size", "12");
+                
+                g.appendChild(rect);
+                g.appendChild(text);
+                svg.appendChild(g);
+                
+                record.element = g;
+                records.push(record);
+            }
+            
+            // Create initial records
+            for (let i = 0; i < 15; i++) {
+                createRecord();
+            }
+            
+            function animate() {
+                records.forEach(record => {
+                    record.x += record.speedX;
+                    record.y += record.speedY;
+                    record.rotation += 0.1;
+                    
+                    if (record.x < -60) record.x = window.innerWidth;
+                    if (record.x > window.innerWidth) record.x = -60;
+                    if (record.y < -30) record.y = window.innerHeight;
+                    if (record.y > window.innerHeight) record.y = -30;
+                    
+                    record.element.setAttribute("transform", 
+                        `translate(${record.x},${record.y}) rotate(${record.rotation}, 30, 15)`);
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+            
+            // Handle window resize
+            let prevWidth = window.innerWidth;
+            let prevHeight = window.innerHeight;
+            
+            window.addEventListener('resize', () => {
+                records.forEach(record => {
+                    record.x *= window.innerWidth / prevWidth;
+                    record.y *= window.innerHeight / prevHeight;
+                });
+                prevWidth = window.innerWidth;
+                prevHeight = window.innerHeight;
+            });
+        });
+    </script>
+} 

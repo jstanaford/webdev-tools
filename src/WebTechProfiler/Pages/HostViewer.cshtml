@@ -1,0 +1,163 @@
+@page "/host-viewer/{ip?}"
+@model HostViewerModel
+@{
+    if (!string.IsNullOrEmpty(Model.Url))
+    {
+        Layout = "_HostViewerLayout";
+    }
+    ViewData["Title"] = "Host Viewer";
+}
+
+@if (string.IsNullOrEmpty(Model.Url))
+{
+    <div class="bg-white relative overflow-hidden">
+        <!-- Background Animation -->
+        <div class="absolute inset-0 z-0">
+            <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- DNS record pattern -->
+                    <pattern id="dnsGrid" width="100" height="100" patternUnits="userSpaceOnUse">
+                        <rect width="100" height="100" fill="none" stroke="rgba(99, 102, 241, 0.05)" stroke-width="1"/>
+                        <text x="10" y="20" fill="rgba(99, 102, 241, 0.07)" font-family="monospace" font-size="10">A</text>
+                        <text x="60" y="50" fill="rgba(99, 102, 241, 0.07)" font-family="monospace" font-size="10">CNAME</text>
+                        <text x="30" y="80" fill="rgba(99, 102, 241, 0.07)" font-family="monospace" font-size="10">MX</text>
+                    </pattern>
+                    <!-- Gradient for floating elements -->
+                    <linearGradient id="hostGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="rgba(99, 102, 241, 0.2)"/>
+                        <stop offset="100%" stop-color="rgba(99, 102, 241, 0)"/>
+                    </linearGradient>
+                </defs>
+                
+                <!-- Background Pattern -->
+                <rect width="100%" height="100%" fill="url(#dnsGrid)" />
+                
+                <!-- Animated Elements Container -->
+                <g class="dns-records"></g>
+            </svg>
+        </div>
+
+        <!-- Existing Content with higher z-index -->
+        <div class="relative isolate px-6 pt-14 lg:px-8 z-10">
+            <div class="mx-auto max-w-4xl py-8">
+                <div class="text-center">
+                    <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-8">Host Viewer</h1>
+                    <p class="text-lg leading-8 text-gray-600 mb-12">View how a website would appear with a different IP address.</p>
+                    <form id="hostViewerForm" class="mt-10">
+                        <div class="space-y-4 max-w-2xl mx-auto">
+                            <div class="min-w-0">
+                                <label for="url" class="block text-sm font-medium leading-6 text-gray-900 text-left mb-2">URL</label>
+                                <input type="text" id="url" name="url" value="@Model.Url"
+                                       class="block w-full rounded-lg border-0 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                       placeholder="Enter URL (e.g., example.com/page)" required />
+                            </div>
+                            <div class="min-w-0">
+                                <label for="ipAddress" class="block text-sm font-medium leading-6 text-gray-900 text-left mb-2">IP Address</label>
+                                <input type="text" id="ipAddress" name="ipAddress" value="@Model.IpAddress"
+                                       class="block w-full rounded-lg border-0 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                       placeholder="Enter IP address (e.g., 192.168.1.1)" required 
+                                       pattern="^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$" />
+                            </div>
+                            <button type="submit" 
+                                    class="w-full rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                View Host
+                            </button>
+                        </div>
+                    </form>
+                    <div id="resultsContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script src="~/js/hostViewer.js" asp-append-version="true"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const svg = document.querySelector('.dns-records');
+                const records = [];
+                
+                // Create floating DNS record
+                function createRecord() {
+                    const types = ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS'];
+                    const record = {
+                        x: Math.random() * window.innerWidth,
+                        y: Math.random() * window.innerHeight,
+                        type: types[Math.floor(Math.random() * types.length)],
+                        speedX: (Math.random() - 0.5) * 0.3,
+                        speedY: (Math.random() - 0.5) * 0.3,
+                        opacity: Math.random() * 0.3 + 0.1
+                    };
+                    
+                    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    
+                    rect.setAttribute("width", "60");
+                    rect.setAttribute("height", "30");
+                    rect.setAttribute("rx", "4");
+                    rect.setAttribute("fill", "url(#hostGradient)");
+                    rect.setAttribute("opacity", record.opacity);
+                    
+                    text.textContent = record.type;
+                    text.setAttribute("x", "30");
+                    text.setAttribute("y", "20");
+                    text.setAttribute("text-anchor", "middle");
+                    text.setAttribute("fill", "rgba(99, 102, 241, 0.8)");
+                    text.setAttribute("font-family", "monospace");
+                    text.setAttribute("font-size", "12");
+                    
+                    g.appendChild(rect);
+                    g.appendChild(text);
+                    svg.appendChild(g);
+                    
+                    record.element = g;
+                    records.push(record);
+                }
+                
+                // Create initial records
+                for (let i = 0; i < 15; i++) {
+                    createRecord();
+                }
+                
+                // Animation loop
+                function animate() {
+                    records.forEach(record => {
+                        record.x += record.speedX;
+                        record.y += record.speedY;
+                        
+                        if (record.x < -60) record.x = window.innerWidth;
+                        if (record.x > window.innerWidth) record.x = -60;
+                        if (record.y < -30) record.y = window.innerHeight;
+                        if (record.y > window.innerHeight) record.y = -30;
+                        
+                        record.element.setAttribute("transform", `translate(${record.x},${record.y})`);
+                    });
+                    
+                    requestAnimationFrame(animate);
+                }
+                
+                animate();
+                
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    records.forEach(record => {
+                        record.x *= window.innerWidth / prevWidth;
+                        record.y *= window.innerHeight / prevHeight;
+                    });
+                    prevWidth = window.innerWidth;
+                    prevHeight = window.innerHeight;
+                });
+                
+                let prevWidth = window.innerWidth;
+                let prevHeight = window.innerHeight;
+            });
+        </script>
+    }
+}
+else
+{
+    <div>
+        @await Component.InvokeAsync("RemoteContent", new { ip = Model.IpAddress, url = Model.Url })
+    </div>
+} 
